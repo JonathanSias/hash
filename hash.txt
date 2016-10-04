@@ -1,0 +1,6 @@
+//Jonathan Sias
+//10205513
+
+	O programa implementa as funções padrão de inserção, remoção, consulta e saída. Ainda faz o rehash e a função hash para inserção das palavras na tabela. Não imprime as variações da palavra, no caso os 4 requisitos do algoritmo de reconhecimento.
+
+	Utiliza uma hash com 256 posições, inicialmente, onde quando ocorre da função hash calcular um indice já existente, o elemento a ser inserido é colocado na próxima posição disponível.
