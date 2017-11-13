@@ -1,9 +1,3 @@
-// Jonathan Sias
-// 10205513
-// AEDII
-// Trabalho 1
-// Tabela Hash
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,7 +12,7 @@ int chaves = 0;
 // vetor char contendo palavra
 char palavra[99];
 // tamanho inicial da hash
-int tamanho = 997;
+int tamanho = 1021;
 // tabela hash
 struct tabela
 {
@@ -107,7 +101,8 @@ void correcao(){
 int main(){
 	inicializar();
 	scanf("%s", palavra);
-	
+	int x = 0;
+
 	/*
 	do{
 		// primaira leitura
