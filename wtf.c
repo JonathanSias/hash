@@ -88,11 +88,12 @@ int insercao(char *word){
 		if (tabelaHash[posicao].dado == NULL)
 		{
 			tabelaHash[posicao].dado = word;
+			posicoes++;
 			return 1;
 		}else{
 			if (sondagemLinear(word, posicao) == 1)
 			{
-				posicao++;
+				posicoes++;
 				return 1;
 			}
 		}
@@ -101,8 +102,24 @@ int insercao(char *word){
 
 // remoçao
 int remocao(char *word){
-	//
-	return 0;
+	int i;
+	int posicao = (dispersao(word));
+	if ((tabelaHash[posicao].dado != NULL) && (strcmp(tabelaHash[posicao].dado, word) == 0))
+	{
+		tabelaHash[posicao].dado = NULL;
+		posicoes--;
+		return 1;
+	}else{
+		for (i = posicao++; i < tamanho; ++i)
+		{
+			if ((tabelaHash[i].dado != NULL) && (strcmp(tabelaHash[i].dado, word) == 0))
+			{
+				tabelaHash[i].dado = NULL;
+				posicoes--;
+				return 1;
+			}
+		}
+	}
 }
 
 // listar elementos
