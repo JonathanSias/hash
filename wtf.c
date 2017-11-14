@@ -30,10 +30,32 @@ void inicializar(){
 	}
 }
 
+// funçao hash
+int dispersao(char *word){
+	int i;
+	int h = 0;
+	for (i = 0; word[i] != '\0'; ++i)
+	{
+		h = (h + word[i]);
+	}
+	h = (h % tamanho);
+	return h;
+}
+
 // inserçao
-int insercao(){
-	//
-	return 0;
+int insercao(char *word){
+	int posicao = 0;
+	posicao = dispersao(word);
+	if (busca(word) == 0)
+	{
+		if (tabelaHash[posicao].dado == NULL)
+		{
+			tabelaHash[posicao].dado = word;
+			return 1;
+		}else{
+			//
+		}
+	}
 }
 
 // remoçao
@@ -43,9 +65,27 @@ int remocao(){
 }
 
 // busca
-int busca(){
-	//
-	return 0;
+int busca(char *word){
+	int posicao = 0;
+	posicao = dispersao(word);
+	if (tabelaHash[posicao].dado != NULL)
+	{
+		if (strcmp(word, tabelaHash[posicao].dado) == 0)
+		{
+			return 1;
+		}else{
+			posicao++;
+			for (int i = posicao; i < tamanho; ++i)
+			{
+				if (strcmp(word, tabelaHash[posicao].dado) == 0)
+				{
+					return 1;
+				}
+			}
+		}
+	}else{
+		return 0;
+	}
 }
 
 // listar elementos
@@ -55,18 +95,6 @@ void listar(){
 	{
 		printf("%s\n", tabelaHash[i]);
 	}
-}
-
-// funçao hash
-int dispercao(char *word){
-	int i;
-	int h = 0;
-	for (i = 0; word[i] != '\0'; ++i)
-	{
-		h = (h + word[i]);
-	}
-	h = (h % tamanho);
-	return h;
 }
 
 // tratando colisao
@@ -101,8 +129,7 @@ void correcao(){
 int main(){
 	inicializar();
 	scanf("%s", palavra);
-	int x = 0;
-
+	//
 	/*
 	do{
 		// primaira leitura
@@ -110,28 +137,28 @@ int main(){
 		// passando caracteres maiusculos para minusculos
 		minusculas(palavra);
 		// comparando tamanho da entrada
-		if (strlen(palavra) == 0)
+		if (strlen(palavra) < 1)
 		{
-			printf("fail");
+			printf("fail\n");
 		}else{
 			if (strlen(palavra) == 1)
 			{
-				if ((strcmp(palavra, "+") != 0) && (strcmp(palavra, "-") != 0) && (strcmp(palavra, "*") != 0))
-				{
-					printf("fail");
-				}
-			}else{
 				if (strcmp(palavra, "+") == 0)
 				{
-					//
-				}
-				if (strcmp(palavra, "-") == 0)
-				{
-					//
-				}
-				if (strcmp(palavra, "*"))
-				{
-					//
+					if ((posicoes/tamanho) >= 0.7)
+					{
+						//rehash
+					}else{
+						//add
+						//posicoes++;
+					}
+				}else{
+					if (strcmp(palavra, "-") == 0)
+					{
+						//
+					}else{
+						//
+					}
 				}
 			}
 		}
