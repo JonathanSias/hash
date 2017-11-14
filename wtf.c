@@ -42,26 +42,17 @@ int dispersao(char *word){
 	return h;
 }
 
-// inserçao
-int insercao(char *word){
-	int posicao = 0;
-	posicao = dispersao(word);
-	if (busca(word) == 0)
+// tratando colisao
+int sondagemLinear(char *word, int position){
+	int i;
+	for (i = position; i < tamanho; ++i)
 	{
-		if (tabelaHash[posicao].dado == NULL)
+		if (tabelaHash[i].dado == NULL)
 		{
-			tabelaHash[posicao].dado = word;
+			tabelaHash[i].dado = word;
 			return 1;
-		}else{
-			//
 		}
 	}
-}
-
-// remoçao
-int remocao(){
-	//
-	return 0;
 }
 
 // busca
@@ -88,6 +79,32 @@ int busca(char *word){
 	}
 }
 
+// inserçao
+int insercao(char *word){
+	int posicao = 0;
+	posicao = dispersao(word);
+	if (busca(word) == 0)
+	{
+		if (tabelaHash[posicao].dado == NULL)
+		{
+			tabelaHash[posicao].dado = word;
+			return 1;
+		}else{
+			if (sondagemLinear(word, posicao) == 1)
+			{
+				posicao++;
+				return 1;
+			}
+		}
+	}
+}
+
+// remoçao
+int remocao(char *word){
+	//
+	return 0;
+}
+
 // listar elementos
 void listar(){
 	int i;
@@ -95,12 +112,6 @@ void listar(){
 	{
 		printf("%s\n", tabelaHash[i]);
 	}
-}
-
-// tratando colisao
-int sondagemLinear(){
-	//
-	return 0;
 }
 
 // funçao rehash
@@ -122,7 +133,7 @@ void minusculas(char *word){
 }
 
 // corrige palavra
-void correcao(){
+void correcao(char *word){
 	//
 }
 
@@ -145,17 +156,17 @@ int main(){
 			{
 				if (strcmp(palavra, "+") == 0)
 				{
-					if ((posicoes/tamanho) >= 0.7)
+					if ((fatorDeCarga = (posicoes/tamanho)) >= 0.7)
 					{
 						//rehash
 					}else{
 						//add
-						//posicoes++;
 					}
 				}else{
 					if (strcmp(palavra, "-") == 0)
 					{
-						//
+						//remove
+						//posicoes--;
 					}else{
 						//
 					}
