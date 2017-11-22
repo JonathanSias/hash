@@ -127,7 +127,7 @@ void listar(){
 	int i;
 	for (int i = 0; i < tamanho; ++i)
 	{
-		printf("%s\n", tabelaHash[i]);
+		printf("%s\n", tabelaHash[i].dado);
 	}
 }
 
