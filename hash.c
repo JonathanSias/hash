@@ -1,213 +1,264 @@
-// Jonathan Sias
-// 10205513
+/********************
+*	Jonathan Sias
+*		AEDII
+*	Tabelas Hash
+********************/
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
-float fatorCarga = 0.0;
-int m = 256;
-int numPalavras = 0;
-int verifica = 0;
-
-char palavra[100];
-char auxWord[100] = "a";
-
-struct hashTable{						//struct hashTable
-	char *words;
+// fator de carga para rehash
+float fatorDeCarga = 0.0;
+// numero posiçoes da hash
+int posicoes = 0;
+// numero de chaves da hash
+int chaves = 0;
+// vetor char contendo palavra
+char palavra[99];
+// tamanho inicial da hash
+int tamanho = 1021;
+// tabela hash
+struct tabela
+{
+	char *dado;
 }*tabelaHash;
+typedef struct tabela hash;
 
-typedef struct hashTable hashTable;		//hashTable do tipo hashTable
-
-void minuscula(char *p){				//passar tudo para letras minusculas
-   int i = 0;
-   while (p[i] != '\0')
-   {
-      if (p[i] >= 'A' && p[i] <= 'Z')
-      {
-         p[i] = p[i] + 32;
-      }
-      i++;
-   }
-}
-
-int consulta(char* p){
+// inicializaçao da hash
+void inicializar(){
+	tabelaHash = malloc(sizeof(hash)*tamanho);
 	int i;
-	int posicao;
-	posicao = calculaIndiceDaTabela(p);		//calcula o indice da string pra verificar
-	if (tabelaHash[posicao].words != NULL)	//se o elemento for diferente de null
+	for (i = 0; i < tamanho; ++i)
 	{
-		if (strcmp(tabelaHash[posicao].words, p) == 0)	//se o elemento é igual ao que se encontra na tabela
-		{
-			return 0;						//retorna 0 - ok
-		} else{
-			posicao++;
-			for (i = posicao; i < m; ++i)
-			{
-				if (strcmp(tabelaHash[i].words, p) == 0)
-				{
-					return 0;
-				}
-			}
-		}
-	} else{
-		return 1;							//retorna 1 - not found
+		tabelaHash[i].dado = NULL;
 	}
 }
 
-int adiciona(char* p){
+// funçao hash
+int dispersao(char *word){
 	int i;
-	int posicao;
-	posicao = calculaIndiceDaTabela(p);			//calcula o indice para verificar
-	//printf("%d\n", posicao);	//testa com indice pra ver se esta fazendo corretamente
-	if(consulta(p) == 1){
-		if (tabelaHash[posicao].words == NULL){	//se o elemento for diferente de null
-			tabelaHash[posicao].words = p;		//atribui a string a posicao calculada pela funcao hash
-			return 0;							//retorna 0 - ok
-		} else{
-			posicao++;
-			for (i = posicao; i < m; ++i)
-			{
-				if (tabelaHash[i].words == NULL)
-				{
-					tabelaHash[i].words = p;
-					return 0;
-				}
-			}
-			//return 0;
-		}
-	} else{
-		return 1;
-	}
-}
-
-int remover(char* p){
-	int i;
-	int posicao;
-	posicao = calculaIndiceDaTabela(p);			//calcula o indice pra verificar
-	if(tabelaHash[posicao].words != NULL){		//caso a informaçao seja diferente de null
-		if (strcmp(tabelaHash[posicao].words, p) == 0){	//se o elemento for igual ao informado
-			tabelaHash[posicao].words = NULL;	//atribui null a posicao calculada
-			return 0;							//retorna 0 - ok
-		} else{
-			posicao++;
-			for (i = posicao; i < m; ++i)
-			{
-				if (strcmp(tabelaHash[i].words, p) == 0)
-				{
-					tabelaHash[i].words = NULL;
-					return 0;
-				}
-			}
-			//return 0;
-		}
-	} else{
-		return 1;								//retorna 1 - fail
-	}
-
-}
-
-void reHash(){
-	hashTable* secondHash;
-	hashTable* thirdHash;
-	m = (m*2);
-	int i;
-
-	//outras duas hashes para auxiliar no rehash
-	secondHash = malloc (sizeof(hashTable)*m);
-	thirdHash = malloc (sizeof(hashTable)*m);
-
-	for (i = 0; i < m; i++) {
-        secondHash[i].words = NULL;
-	}
-
-	thirdHash = tabelaHash;
-	tabelaHash = secondHash;
-
-	for (i = 0; i < m/2; i++)
+	int h = 0;
+	for (i = 0; word[i] != '\0'; ++i)
 	{
-		if (thirdHash[i].words != 0)
-		{
-			adiciona(thirdHash[i].words);
-		}
+		h = (h + word[i]);
 	}
-}
-
-//funçao hash
-int calculaIndiceDaTabela(char* p){
-	int i;
-	int h = p[0];
-	for (i = 1; p[i] != '\0'; i++)
-	{
-		h = (h * 251 + p[i]) % m;
-	}
+	h = (h % tamanho);
 	return h;
 }
 
-int main(){
+// tratando colisao
+int sondagemLinear(char *word, int position){
+	int i;
+	for (i = position; i < tamanho; ++i)
+	{
+		if (tabelaHash[i].dado == NULL)
+		{
+			tabelaHash[i].dado = word;
+			return 1;
+		}
+	}
+}
 
-	tabelaHash = malloc(sizeof(hashTable)*m);		//cria tabela
-	strcpy(auxWord, "");
+// busca
+int busca(char *word){
+	int posicao = 0;
+	posicao = dispersao(word);
+	if (tabelaHash[posicao].dado != NULL)
+	{
+		if (strcmp(word, tabelaHash[posicao].dado) == 0)
+		{
+			return 1;
+		}else{
+			posicao++;
+			for (int i = posicao; i < tamanho; ++i)
+			{
+				if (strcmp(word, tabelaHash[posicao].dado) == 0)
+				{
+					return 1;
+				}
+			}
+		}
+	}else{
+		return 0;
+	}
+}
+
+// inserçao
+int insercao(char *word){
+	int posicao = 0;
+	posicao = dispersao(word);
+	if (busca(word) == 0)
+	{
+		if (tabelaHash[posicao].dado == NULL)
+		{
+			tabelaHash[posicao].dado = word;
+			posicoes++;
+			return 1;
+		}else{
+			if (sondagemLinear(word, posicao) == 1)
+			{
+				posicoes++;
+				return 1;
+			}
+		}
+	}else{
+		return 0;
+	}
+}
+
+// remoçao
+int remocao(char *word){
+	int i;
+	int posicao = (dispersao(word));
+	if ((tabelaHash[posicao].dado != NULL) && (strcmp(tabelaHash[posicao].dado, word) == 0))
+	{
+		tabelaHash[posicao].dado = NULL;
+		posicoes--;
+		return 1;
+	}else{
+		for (i = posicao++; i < tamanho; ++i)
+		{
+			if ((tabelaHash[i].dado != NULL) && (strcmp(tabelaHash[i].dado, word) == 0))
+			{
+				tabelaHash[i].dado = NULL;
+				posicoes--;
+				return 1;
+			}
+		}
+	}
+}
+
+// funçao rehash
+void rehash(){
+	hash* hashAuxiliar;
+	int tam = 0;
+	tam = (tamanho*2);
+	int i;
+	hashAuxiliar = malloc (sizeof(hash)*tam);
+	// atribuindo NULL ao hash auxiliar
+	for (i = 0; i < tam; ++i)
+	{
+		hashAuxiliar[i].dado = NULL;
+	}
+	// copiando valores para hash auxiliar
+	for (i = 0; i < tamanho; ++i)
+	{
+		hashAuxiliar[i].dado = tabelaHash[i].dado;
+	}
+	tamanho = (tamanho*2);
+	// hash principal recebe NULL
+	for (i = 0; i < tamanho; ++i)
+	{
+		tabelaHash[i].dado = NULL;
+	}
+	// devolve valores pra hash principal
+	for (i = 0; i < tamanho; ++i)
+	{
+		tabelaHash[i].dado = hashAuxiliar[i].dado;
+	}
+}
+
+// para letras minusculas
+void minusculas(char *word){
+	int i = 0;
+	while(word[i] != '\0')
+	{
+		if (word[i] >= 'A' && word[i] <= 'Z')
+		{
+			word[i] = word[i] + 32;
+		}
+		i++;
+	}
+}
+
+void correcao(char *word){
+	int localiza = dispersao(word);
+	int acertos = 0;
+	for (int i = localiza; tabelaHash[i].dado == NULL; ++i)
+	{
+		for (int j = 0; j < (strlen(word)+1); ++j)
+		{
+			if (tabelaHash[i].dado[j] == word[j])
+			{
+				acertos++;
+			}
+		}
+		if (acertos < (strlen(word)-1))
+		{
+			printf("%s\n", word);
+		}
+		acertos = 0;
+	}
+}
+
+int main(){
+	inicializar();
+	// auxiliar de leitura
+	char palavraAuxiliar[99];
+	strcpy(palavraAuxiliar, "");
 	do
 	{
 		do
 		{
-			scanf("%s", palavra);			//primeira leitura
-			minuscula(palavra);				//passa a palavra para minuscula
-
+			scanf("%s", palavra);
 			if ((strcmp(palavra, "+") != 0) && (strcmp(palavra, "-") != 0) && (strcmp(palavra, "*") != 0))
 			{
-				strcpy(auxWord, palavra);
-				if (consulta(auxWord) == 1)
+				strcpy(palavraAuxiliar, palavra);
+				if (busca(palavraAuxiliar) == 1)
 				{
+					printf("ok %s\n", palavraAuxiliar);
+					correcao(palavraAuxiliar);
+				}else{
 					printf("not found\n");
-				} else{
-					printf("ok\n");
 				}
+			}else{
+				//
 			}
-
-		} while (strlen(palavra) != 1);
-
-		if (strlen(auxWord) == 0)
+		} while (strlen(palavra) > 1);
+		// se leitura nao for uma palavra
+		if (strlen(palavraAuxiliar) == 0)
 		{
 			printf("fail\n");
-		} else{
+		}else{
 			if (strcmp(palavra, "+") == 0)
 			{
-				if ((fatorCarga = (numPalavras / m)) >= 0.7)
+				if ((fatorDeCarga = (posicoes/tamanho)) >= 0.85)
 				{
-					reHash();
-					if (adiciona(auxWord) == 0)
+					rehash();
+					if (busca(palavra) == 0)
 					{
-						numPalavras++;
-						printf("ok\n");
-					} else{
-						printf("fail\n");
+						if (insercao(palavraAuxiliar) == 1)
+						{
+							printf("ok %s\n", palavraAuxiliar);
+						}else{
+							printf("fail %s\n", palavraAuxiliar);
+						}
 					}
-				} else{
-					if (adiciona(auxWord) == 0)
+				}else{
+					if (busca(palavra) == 0)
 					{
-						numPalavras++;
-						printf("ok\n");
-					} else{
-						printf("fail\n");
+						if (insercao(palavraAuxiliar) == 1)
+						{
+							printf("ok %s\n", palavraAuxiliar);
+						}else{
+							printf("fail %s\n", palavraAuxiliar);
+						}
 					}
 				}
-			} else{
+			}else{
 				if (strcmp(palavra, "-") == 0)
 				{
-					if (remover(auxWord) == 0)
+					if (remocao(palavraAuxiliar) == 1)
 					{
-						numPalavras--;
-						printf("ok\n");
-					} else{
-						printf("fail\n");
+						printf("ok %s\n", palavraAuxiliar);
+					}else{
+						printf("fail %s\n", palavraAuxiliar);
 					}
 				}
 			}
 		}
-
-	} while ((strcmp(palavra, "*") != 0));
-
+	} while (strcmp(palavra, "*") != 0);
 	return 0;
 }
